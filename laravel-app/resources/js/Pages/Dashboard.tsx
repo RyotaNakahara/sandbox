@@ -42,8 +42,16 @@ export default function Dashboard() {
                 setStats(statsRes.data);
                 setSystemInfo(systemInfoRes.data);
                 setRecentUsers(recentUsersRes.data);
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Failed to fetch dashboard data:', error);
+                if (error.response) {
+                    console.error('Response status:', error.response.status);
+                    console.error('Response data:', error.response.data);
+                } else if (error.request) {
+                    console.error('No response received:', error.request);
+                } else {
+                    console.error('Error:', error.message);
+                }
             } finally {
                 setLoading(false);
             }
