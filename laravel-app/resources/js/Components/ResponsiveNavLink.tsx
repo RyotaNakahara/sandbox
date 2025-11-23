@@ -1,14 +1,24 @@
-import { InertiaLinkProps, Link } from '@inertiajs/react';
+import { Link, LinkProps } from 'react-router-dom';
+import { ReactNode, MouseEventHandler } from 'react';
+
+interface ResponsiveNavLinkProps extends Omit<LinkProps, 'className'> {
+    active?: boolean;
+    className?: string;
+    children: ReactNode;
+    onClick?: MouseEventHandler<HTMLAnchorElement>;
+}
 
 export default function ResponsiveNavLink({
     active = false,
     className = '',
     children,
+    onClick,
     ...props
-}: InertiaLinkProps & { active?: boolean }) {
+}: ResponsiveNavLinkProps) {
     return (
         <Link
             {...props}
+            onClick={onClick}
             className={`flex w-full items-start border-l-4 py-2 pe-4 ps-3 ${
                 active
                     ? 'border-indigo-400 bg-indigo-50 text-indigo-700 focus:border-indigo-700 focus:bg-indigo-100 focus:text-indigo-800'

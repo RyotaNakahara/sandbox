@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -11,10 +10,8 @@ class DashboardController extends Controller
     /**
      * ダッシュボード用の統計データを取得
      */
-    public function stats(Request $request): JsonResponse
+    public function stats(): JsonResponse
     {
-        $user = $request->user();
-
         $stats = [
             'total_users' => DB::table('users')->count(),
             'registered_today' => DB::table('users')
@@ -32,7 +29,7 @@ class DashboardController extends Controller
     /**
      * 最近のユーザー登録を取得
      */
-    public function recentUsers(Request $request): JsonResponse
+    public function recentUsers(): JsonResponse
     {
         $users = DB::table('users')
             ->select('id', 'name', 'email', 'created_at')

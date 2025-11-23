@@ -2,17 +2,43 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
+import axios from 'axios';
+
+interface User {
+    name: string;
+    email: string;
+}
 
 export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    const user = usePage().props.auth.user;
+    const [user, setUser] = useState<User | null>(null);
+    const location = useLocation();
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+
+    useEffect(() => {
+        // ユーザー情報を取得
+        axios.get('/api/user')
+            .then((response) => setUser(response.data))
+            .catch(() => {
+                // 未認証の場合はログインページへリダイレクト
+                window.location.href = '/login';
+            });
+    }, []);
+
+    if (!user) {
+        return (
+            <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                <p className="mt-2 text-gray-600">読み込み中...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -21,15 +47,15 @@ export default function Authenticated({
                     <div className="flex h-16 justify-between">
                         <div className="flex">
                             <div className="flex shrink-0 items-center">
-                                <Link href="/">
+                                <Link to="/">
                                     <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
                                 </Link>
                             </div>
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
+                                    to="/"
+                                    active={location.pathname === '/'}
                                 >
                                     Dashboard
                                 </NavLink>
@@ -64,15 +90,16 @@ export default function Authenticated({
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
+                                        <Dropdown.Link to="/profile">
                                             Profile
                                         </Dropdown.Link>
                                         <Dropdown.Link
-                                            href={route('logout')}
-                                            method="post"
-                                            as="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                axios.post('/api/logout').then(() => {
+                                                    window.location.href = '/login';
+                                                });
+                                            }}
                                         >
                                             Log Out
                                         </Dropdown.Link>
@@ -132,8 +159,8 @@ export default function Authenticated({
                 >
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
+                            to="/"
+                            active={location.pathname === '/'}
                         >
                             Dashboard
                         </ResponsiveNavLink>
@@ -150,13 +177,16 @@ export default function Authenticated({
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
+                            <ResponsiveNavLink to="/profile">
                                 Profile
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    axios.post('/api/logout').then(() => {
+                                        window.location.href = '/login';
+                                    });
+                                }}
                             >
                                 Log Out
                             </ResponsiveNavLink>

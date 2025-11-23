@@ -1,25 +1,25 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
+import Dashboard from './Pages/Dashboard';
+import Information from './Pages/Information';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const App = () => {
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/information" element={<Information />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </BrowserRouter>
+    );
+};
 
-createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.tsx`,
-            import.meta.glob('./Pages/**/*.tsx'),
-        ),
-    setup({ el, App, props }) {
-        const root = createRoot(el);
-
-        root.render(<App {...props} />);
-    },
-    progress: {
-        color: '#4B5563',
-    },
-});
+const rootElement = document.getElementById('app');
+if (rootElement) {
+    const root = createRoot(rootElement);
+    root.render(<App />);
+}
